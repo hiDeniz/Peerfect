@@ -52,6 +52,15 @@ module.exports = {
             console.error(error); // It's a good practice to log the error for debugging.
             return res.status(500).json({ message: "Internal Server Error" });
         }
+    },
+
+    homeUser: async (req, res) => {
+        try {
+            res.send('Hello World!');
+        }
+        catch(error) {
+            res.status(500).json(error);
+        }
     }
     
 }

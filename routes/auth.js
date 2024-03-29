@@ -7,8 +7,6 @@ router.post("/register", authController.createUser);
 // LOGIN 
 router.post("/login", authController.loginUser);
 
-app.get('/home', (req, res) => {
-    res.send('Hello World!');
-  });
+router.get('/home', authController.homeUser);
 
 module.exports = router
