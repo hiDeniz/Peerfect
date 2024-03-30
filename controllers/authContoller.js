@@ -42,14 +42,14 @@ module.exports = {
                 {
                     id: user._id,
                 },
-                process.env.JWT_SEC || 'default_jwt_secret',
+                process.env.SECRET || 'default_secret_key',
                 { expiresIn: '21d' }
             );
     
             const { password, __v, createdAt, ...others } = user._doc;
             res.status(200).json({ ...others, userToken });
         } catch (error) {
-            console.error(error); // It's a good practice to log the error for debugging.
+            console.error(error);
             return res.status(500).json({ message: "Internal Server Error" });
         }
     },
