@@ -7,6 +7,7 @@ router.post("/register", authController.createUser);
 // LOGIN 
 router.post("/login", authController.loginUser);
 
+//deploy test
 router.get('/home', authController.homeUser);
 
 module.exports = router
