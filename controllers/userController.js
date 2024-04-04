@@ -9,7 +9,7 @@ module.exports = {
 
         try{
             const updateUser = await User.findByIdAndUpdate(
-                req.user.id, {
+                req.params.id, {
                     $set: req.body
                 }, {new: true}
             );
@@ -18,6 +18,15 @@ module.exports = {
 
             res.status(200).json({...others});
         } catch(error) {
+            res.status(500).json(error)
+        }
+    },
+
+    deleteUser: async (req, res) => {
+        try {
+            await User.findByIdAndDelete(req.params.id)
+            res.status(200).json("Account Successfully Deleted")
+        } catch (error) {
             res.status(500).json(error)
         }
     },
