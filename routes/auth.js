@@ -7,6 +7,9 @@ router.post("/register", authController.createUser);
 // LOGIN 
 router.post("/login", authController.loginUser);
 
+// VERIFY
+router.post("/verify-email", authController.verifyEmail);
+
 //deploy test
 router.get('/home', authController.homeUser);
 

@@ -2,6 +2,7 @@ const User = require("../models/User");
 const CryptoJS = require("crypto-js");
 
 module.exports = {
+    // Update function
     updateUser: async (req, res) => {
         if(req.body.password){
             req.body.password = CryptoJS.AES.encrypt(req.body.password, process.env.SECRET).toString();
@@ -22,6 +23,7 @@ module.exports = {
         }
     },
 
+    // Delete function
     deleteUser: async (req, res) => {
         try {
             await User.findByIdAndDelete(req.params.id)
