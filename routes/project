@@ -1,0 +1,8 @@
+const router = require("express").Router();
+const projectController = require("../controllers/projectController");
+const {verifyAndAuthorization, verifyToken, verifyAndAdmin} = require("../middleware/verifyToken");
+
+// POST PROJECT
+router.post("/:id", verifyAndAuthorization, projectController.createProject);
+
+module.exports = router

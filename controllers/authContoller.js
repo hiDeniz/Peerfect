@@ -52,7 +52,7 @@ module.exports = {
             }
 
             const accessToken = jwt.sign(
-                { id: user._id, isAdmin: user.isInstructor },
+                { id: user._id, isAdmin: user.isAdmin },
                 process.env.SECRET,
                 { expiresIn: '21d' }
             );

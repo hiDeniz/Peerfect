@@ -33,4 +33,26 @@ module.exports = {
         }
     },
 
+    // Get User function
+    getUser: async (req, res) => {
+        try {
+            const user = await User.findById(req.params.id);
+            const {password, __v, createdAt, updaredAt, ...userData} = user._doc; 
+            res.status(200).json(userData)
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    },
+
+    // Get All User function
+    getAllUsers: async (req, res) => {
+        try {
+            const allUser = await User.find();
+
+            res.status(200).json(allUser)
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    },
+
 }
