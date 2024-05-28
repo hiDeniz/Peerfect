@@ -82,13 +82,4 @@ module.exports = {
             res.status(500).json(error);
         }
     },
-
-    // Simple home endpoint for tests
-    homeUser: async (req, res) => {
-        try {
-            res.send('Hello World!');
-        } catch (error) {
-            res.status(500).json(error);
-        }
-    }
 };

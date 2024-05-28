@@ -10,7 +10,20 @@ const UserSchema = new mongoose.Schema(
         isStudent: { type: Boolean, required: true, default: false },
         isInstructor: { type: Boolean, required: true, default: false },
         verificationCode: { type: String },
-        verified: { type: Boolean, default: false }
+        verified: { type: Boolean, default: false },
+        university: { type: String },
+        degree: { type: String },
+        term: { type: String },
+        schoolID: { type: Number},
+        gpa: { type:Number },
+        completedCourses: { type: Map, of: String },
+        projects: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'Project' }
+        ],
+        reviews: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'Review'}
+        ],
+        imageUrl: { type: String } //düzenlenecek!!!
     },
     { timestamps: true }
 );

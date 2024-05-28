@@ -26,7 +26,7 @@ const verifyAndAuthorization = (req, res, next) => {
         } else {
             res.status(403).json("You are restricted from performing this operation!");
         }
-    })
+    });
 };
 
 const verifyAndAdmin = (req, res, next) => {
