@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const User = require("../models/User");
 
 module.exports = {
     // Create Project function
@@ -7,6 +8,13 @@ module.exports = {
 
         try{
             const savedProject = await newProject.save();
+
+            await User.findByIdAndUpdate(
+                req.body.owner,
+                { $push: { projects: savedProject._id } },
+                { new: true }
+            );
+            
             const {__v, createdAt, updatedAt, ...newProjectInfo} = savedProject._doc; 
 
             res.status(201).json(newProjectInfo);
