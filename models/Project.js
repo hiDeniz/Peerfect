@@ -12,7 +12,7 @@ const ProjectSchema = new mongoose.Schema(
         minGPA: { type: Number },
         expectedPeople: { type: Number },
         expectedCourses: [ {type: String } ],
-        isCompleted: {type: Boolean, required: true, default: false}
+        isOpen: {type: Boolean, required: true, default: true}
     }
 );
 

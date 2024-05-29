@@ -53,6 +53,9 @@ module.exports = {
     getProject: async (req, res) => {
         try {
             const project = await Project.findById(req.params.id)
+                .populate('owner')
+                .populate('team');
+                
             res.status(200).json(project);
         } catch (error) {
             res.status(500).json(error);

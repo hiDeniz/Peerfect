@@ -9,13 +9,13 @@ module.exports = {
         }
 
         try{
-            const updateUser = await User.findByIdAndUpdate(
+            const updatedUser = await User.findByIdAndUpdate(
                 req.params.id, {
                     $set: req.body
                 }, {new: true}
             );
 
-            const {password, __v, createdAt, ...others} = updateUser._doc;
+            const {password, __v, createdAt, ...others} = updatedUser._doc;
 
             res.status(200).json({...others});
         } catch(error) {
@@ -36,8 +36,10 @@ module.exports = {
     // Get User function
     getUser: async (req, res) => {
         try {
-            const user = await User.findById(req.params.id);
-            const {password, __v, createdAt, updaredAt, ...userData} = user._doc; 
+            const user = await User.findById(req.params.id)
+                .populate('projects')
+                .populate('reviews');
+            const {password, __v, createdAt, updatedAt, ...userData} = user._doc;
             res.status(200).json(userData)
         } catch (error) {
             res.status(500).json(error)
