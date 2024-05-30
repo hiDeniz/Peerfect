@@ -14,4 +14,10 @@ router.get("/:id", verifyAndAuthorization, userController.getUser);
 // GET ALL USERS
 router.get("/", verifyAndAdmin, userController.getAllUsers);
 
+// GET POST of USER
+router.get("/post/:id", verifyAndAuthorization, userController.getUserPost);
+
+// GET REVİEW of USER
+router.get("/review/:id", verifyAndAuthorization, userController.getUserReview);
+
 module.exports = router

@@ -7,8 +7,6 @@ const UserSchema = new mongoose.Schema(
         mail: { type: String, required: true, unique: true },
         password: { type: String, required: true },
         isAdmin: { type: Boolean, default: false },
-        isStudent: { type: Boolean, required: true, default: false },
-        isInstructor: { type: Boolean, required: true, default: false },
         verificationCode: { type: String },
         verified: { type: Boolean, default: false },
         university: { type: String },
@@ -18,6 +16,9 @@ const UserSchema = new mongoose.Schema(
         gpa: { type:Number },
         completedCourses: { type: Map, of: String },
         projects: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'Project' }
+        ],
+        posts: [
             { type: mongoose.Schema.Types.ObjectId, ref: 'Project' }
         ],
         reviews: [

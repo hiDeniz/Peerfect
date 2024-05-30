@@ -38,7 +38,7 @@ module.exports = {
         try {
             const user = await User.findById(req.params.id)
                 .populate('projects')
-                .populate('reviews');
+                .populate('posts');
             const {password, __v, createdAt, updatedAt, ...userData} = user._doc;
             res.status(200).json(userData)
         } catch (error) {
@@ -57,4 +57,25 @@ module.exports = {
         }
     },
 
+    getUserPost: async (req, res) => {
+        try {
+            const user = await User.findById(req.params.id)
+                .populate('posts');
+
+            res.status(200).json(user.posts)
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    },
+
+    getUserReview: async (req, res) => {
+        try {
+            const user = await User.findById(req.params.id)
+                .populate('reviews');
+
+            res.status(200).json(user.reviews)
+        } catch (error) {
+            res.status(500).json(error)
+        }
+    }
 }

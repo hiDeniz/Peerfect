@@ -17,8 +17,6 @@ module.exports = {
             surname: req.body.surname,
             mail: req.body.mail,
             password: CryptoJS.AES.encrypt(req.body.password, process.env.SECRET).toString(),
-            isStudent: req.body.isStudent,
-            isInstructor: req.body.isInstructor,
             verificationCode: verificationCode,
             verified: false
         });

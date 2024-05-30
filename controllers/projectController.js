@@ -11,7 +11,7 @@ module.exports = {
 
             await User.findByIdAndUpdate(
                 req.body.owner,
-                { $push: { projects: savedProject._id } },
+                { $push: { posts: savedProject._id } },
                 { new: true }
             );
             
@@ -53,9 +53,8 @@ module.exports = {
     getProject: async (req, res) => {
         try {
             const project = await Project.findById(req.params.id)
-                .populate('owner')
                 .populate('team');
-                
+
             res.status(200).json(project);
         } catch (error) {
             res.status(500).json(error);
@@ -67,6 +66,31 @@ module.exports = {
         try {
             const project = await Project.find()
             res.status(200).json(project);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    },
+
+    // Turn Post to Project
+    postToProject: async (req, res) => {
+        try {
+            const updatedProject = await Project.findByIdAndUpdate(
+                req.params.id,
+                {$set: req.body},
+                {new: true}
+            );
+
+            await User.findByIdAndUpdate(
+                updatedProject.owner,
+                { 
+                    $push: { projects: updatedProject._id },
+                    $pull: { posts: updatedProject._id }
+                },
+                { new: true }
+            );
+
+            const {__v, createdAt, updatedAt, ...updatedProjectInfo} = updatedProject._doc;
+            res.status(200).json(updatedProjectInfo);
         } catch (error) {
             res.status(500).json(error);
         }

@@ -17,4 +17,7 @@ router.get("/:id", verifyToken, projectController.getProject);
 // GET ALL PROJECT
 router.get("/", verifyToken, projectController.getAllProjects);
 
+// POST TO PROJECT
+router.put("/close/:id", verifyToken, projectController.postToProject);
+
 module.exports = router
