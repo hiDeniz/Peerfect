@@ -44,10 +44,23 @@ module.exports = {
                 .populate({
                     path: 'posts',
                     select: '_id title expectedPeople relatedCourse minGPA description'
+                })
+                .populate({
+                    path: 'reviews',
+                    select: 'rating'
                 });
-
-            const {password, __v, createdAt, updatedAt, ...userData} = user._doc;
-
+    
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+    
+            const { password, __v, createdAt, updatedAt, ...userData } = user._doc;
+    
+            // Calculate average rating
+            const reviews = user.reviews;
+            const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+            const averageRating = reviews.length ? (totalRating / reviews.length).toFixed(2) : 0;
+    
             const response = {
                 _id: userData._id,
                 name: userData.name,
@@ -59,12 +72,14 @@ module.exports = {
                 term: userData.term,
                 university: userData.university,
                 projects: userData.projects,
-                posts: userData.posts
+                posts: userData.posts,
+                completedCourses: userData.completedCourses,
+                averageRating: parseFloat(averageRating)
             };
-
-            res.status(200).json(response)
+    
+            res.status(200).json(response);
         } catch (error) {
-            res.status(500).json(error)
+            res.status(500).json(error);
         }
     },
 
