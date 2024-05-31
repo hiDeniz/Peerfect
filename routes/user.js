@@ -21,6 +21,6 @@ router.get("/post/:id", verifyAndOtherAuthorization, userController.getUserPost)
 router.get("/review/:id", verifyAndOtherAuthorization, userController.getUserReview);
 
 // GET HOME PAGE of USER
-router.get("/homePage/:id", verifyAndAuthorization, userController.getUserHomePage);
+router.get("/homepage/:id", verifyAndAuthorization, userController.getUserHomePage);
 
 module.exports = router
