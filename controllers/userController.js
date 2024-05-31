@@ -37,10 +37,32 @@ module.exports = {
     getUser: async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
-                .populate('projects')
-                .populate('posts');
+                .populate({
+                    path: 'projects',
+                    select: '_id relatedCourse title'
+                })
+                .populate({
+                    path: 'posts',
+                    select: '_id title expectedPeople relatedCourse minGPA description'
+                });
+
             const {password, __v, createdAt, updatedAt, ...userData} = user._doc;
-            res.status(200).json(userData)
+
+            const response = {
+                _id: userData._id,
+                name: userData.name,
+                surname: userData.surname,
+                degree: userData.degree,
+                gpa: userData.gpa,
+                imageUrl: userData.imageUrl,
+                schoolID: userData.schoolID,
+                term: userData.term,
+                university: userData.university,
+                projects: userData.projects,
+                posts: userData.posts
+            };
+
+            res.status(200).json(response)
         } catch (error) {
             res.status(500).json(error)
         }
@@ -60,22 +82,42 @@ module.exports = {
     getUserPost: async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
-                .populate('posts');
-
-            res.status(200).json(user.posts)
+                .populate({
+                    path: 'posts',
+                    select: '_id title expectedPeople relatedCourse minGPA description'
+                });
+    
+            res.status(200).json(user.posts);
         } catch (error) {
-            res.status(500).json(error)
+            res.status(500).json(error);
         }
     },
 
     getUserReview: async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
-                .populate('reviews');
-
-            res.status(200).json(user.reviews)
+                .populate({
+                    path: 'reviews',
+                    populate: {
+                        path: 'owner',
+                        select: 'name surname'
+                    },
+                    select: '_id owner comment rating'
+                });
+    
+            const reviews = user.reviews.map(review => ({
+                _id: review._id,
+                owner: {
+                    name: review.owner.name,
+                    surname: review.owner.surname
+                },
+                comment: review.comment,
+                rating: review.rating
+            }));
+    
+            res.status(200).json(reviews);
         } catch (error) {
-            res.status(500).json(error)
+            res.status(500).json(error);
         }
     }
 }

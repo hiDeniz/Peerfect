@@ -55,8 +55,18 @@ module.exports = {
                 { expiresIn: '21d' }
             );
 
+            const response = {
+                id: user._id,
+                name: user.name,
+                surname: user.surname,
+                mail: user.mail,
+                isAdmin: user.isAdmin,
+                verified: user.verified,
+                accessToken: accessToken
+            };
+
             const { password, __v, createdAt, verificationCode, ...others } = user._doc;
-            res.status(200).json({ ...others, accessToken });
+            res.status(200).json(response);
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: "Internal Server Error" });
