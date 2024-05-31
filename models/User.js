@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema(
         university: { type: String },
         degree: { type: String },
         term: { type: String },
-        schoolID: { type: Number},
+        schoolID: { type: String},
         gpa: { type:Number },
         completedCourses: { type: Map, of: String },
         projects: [
