@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Project = require("../models/Project");
 const CryptoJS = require("crypto-js");
 
 module.exports = {
@@ -94,6 +95,7 @@ module.exports = {
         }
     },
 
+    // Get Posts of User
     getUserPost: async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
@@ -108,6 +110,7 @@ module.exports = {
         }
     },
 
+    // Get Reviews of User
     getUserReview: async (req, res) => {
         try {
             const user = await User.findById(req.params.id)
@@ -134,5 +137,23 @@ module.exports = {
         } catch (error) {
             res.status(500).json(error);
         }
-    }
+    },
+
+    // Get User Home Page function
+    getUserHomePage: async (req, res) => {
+        try {
+            const user = await User.findById(req.params.id);
+
+            const { gpa, completedCourses } = user;
+
+            const projects = await Project.find({
+                minGPA: { $lte: gpa },
+                relatedCourse: { $in: Array.from(completedCourses.keys()) }
+            });
+
+            res.status(200).json(projects);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    },
 }
