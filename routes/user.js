@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const userController = require("../controllers/userController");
-const {verifyAndAuthorization, verifyToken, verifyAndAdmin} = require("../middleware/verifyToken");
+const {verifyAndAuthorization, verifyToken, verifyAndAdmin, verifyAndOtherAuthorization} = require("../middleware/verifyToken");
 
 // UPDATE 
 router.put("/:id", verifyAndAuthorization, userController.updateUser);
@@ -9,15 +9,15 @@ router.put("/:id", verifyAndAuthorization, userController.updateUser);
 router.delete("/:id", verifyAndAuthorization, userController.deleteUser);
 
 // GET
-router.get("/:id", verifyAndAuthorization, userController.getUser);
+router.get("/:id", verifyAndOtherAuthorization, userController.getUser);
 
 // GET ALL USERS
 router.get("/", verifyAndAdmin, userController.getAllUsers);
 
 // GET POST of USER
-router.get("/post/:id", verifyAndAuthorization, userController.getUserPost);
+router.get("/post/:id", verifyAndOtherAuthorization, userController.getUserPost);
 
 // GET REVİEW of USER
-router.get("/review/:id", verifyAndAuthorization, userController.getUserReview);
+router.get("/review/:id", verifyAndOtherAuthorization, userController.getUserReview);
 
 module.exports = router

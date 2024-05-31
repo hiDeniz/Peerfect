@@ -21,10 +21,25 @@ const verifyToken = (req, res, next) => {
 
 const verifyAndAuthorization = (req, res, next) => {
     verifyToken(req, res, () =>{
-        if(req.user.id == req.params.id){
+        if(req.user.id === req.params.id || req.user.isAdmin){
             next();
         } else {
             res.status(403).json("You are restricted from performing this operation!");
+        }
+    });
+};
+
+const verifyAndOtherAuthorization = async (req, res, next) => {
+    verifyToken(req, res, async () => {
+        try {
+            const user = await User.findById(req.user.id);
+            if (user) {
+                next();
+            } else {
+                res.status(403).json("You are restricted from performing this operation!");
+            }
+        } catch (err) {
+            res.status(500).json(err);
         }
     });
 };
@@ -39,4 +54,4 @@ const verifyAndAdmin = (req, res, next) => {
     });
 };
 
-module.exports = {verifyToken, verifyAndAuthorization, verifyAndAdmin};
+module.exports = {verifyToken, verifyAndAuthorization, verifyAndAdmin, verifyAndOtherAuthorization};
