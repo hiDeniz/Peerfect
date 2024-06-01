@@ -9,6 +9,7 @@ module.exports = {
             const team = req.body.team ? [...new Set([req.body.owner, ...req.body.team])] : [req.body.owner];
             const newProject = new Project({
                 ...req.body,
+                _id: undefined,
                 team: team
             });
 
