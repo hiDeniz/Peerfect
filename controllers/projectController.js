@@ -1,5 +1,9 @@
-const Project = require("../models/Project");
 const User = require("../models/User");
+
+async function getProjectModel() {
+    const Project = await require("../models/Project");
+    return Project;
+}
 
 module.exports = {
     // Create Project function
