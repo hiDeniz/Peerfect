@@ -7,6 +7,7 @@ const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
 const projectRoute = require("./routes/project");
 const reviewRoute = require("./routes/review");
+const applicationRoute = require("./routes/application");
 
 dotenv.config();
 mongoose.connect(process.env.MONGO_URL)
@@ -18,4 +19,5 @@ app.use("/api/", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/projects", projectRoute);
 app.use("/api/reviews", reviewRoute);
+app.use("/api/applications", applicationRoute);
 app.listen(process.env.PORT || port, () => console.log(`Peerfect listening on port ${process.env.PORT}!`))

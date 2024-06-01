@@ -12,7 +12,10 @@ const ProjectSchema = new mongoose.Schema(
         minGPA: { type: Number },
         expectedPeople: { type: Number },
         expectedCourses: [ {type: String } ],
-        isOpen: {type: Boolean, required: true, default: true}
+        isOpen: {type: Boolean, required: true, default: true},
+        applications: [
+            { type: mongoose.Schema.Types.ObjectId, ref: 'Application'}
+        ]
     }
 );
 

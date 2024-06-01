@@ -24,6 +24,9 @@ const UserSchema = new mongoose.Schema(
         reviews: [
             { type: mongoose.Schema.Types.ObjectId, ref: 'Review'}
         ],
+        myApplications:[
+            { type: mongoose.Schema.Types.ObjectId, ref: 'Application'}
+        ],
         imageUrl: { type: String } //düzenlenecek!!!
     },
     { timestamps: true }
