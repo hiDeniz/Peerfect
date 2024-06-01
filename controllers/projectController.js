@@ -14,8 +14,8 @@ module.exports = {
 
             const savedProject = await newProject.save();
 
-            await User.findByIdAndUpdate(
-                req.body.owner,
+            await User.updateMany(
+                { _id: { $in: team } },
                 { $push: { posts: savedProject._id } },
                 { new: true }
             );
@@ -104,6 +104,38 @@ module.exports = {
         } catch (error) {
             res.status(500).json(error);
         }
-    }
+    },
+
+    // Join Project Team function
+    joinProject: async (req, res) => {
+        try {
+            const projectId = req.params.id;
+            const userId = req.user.id;
+
+            const project = await Project.findById(projectId);
+            if (!project) {
+                return res.status(404).json({ message: "Project not found" });
+            }
+
+            if (project.team.includes(userId)) {
+                return res.status(400).json({ message: "User is already in the team" });
+            }
+
+            project.team.push(userId);
+            project.expectedPeople = Math.max(project.expectedPeople - 1, 0);
+
+            await project.save();
+
+            await User.findByIdAndUpdate(
+                userId,
+                { $push: { posts: projectId } },
+                { new: true }
+            );
+
+            res.status(200).json({ message: "User added to the project team", project });
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    },
 
 }

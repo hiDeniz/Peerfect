@@ -20,4 +20,7 @@ router.get("/", verifyToken, projectController.getAllProjects);
 // POST TO PROJECT
 router.put("/close/:id", verifyToken, projectController.postToProject);
 
+// JOIN PROJECT
+router.put("/join/:id", verifyToken, projectController.joinProject);
+
 module.exports = router
