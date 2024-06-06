@@ -8,13 +8,19 @@ router.post("/", verifyToken, applicationController.createApplication);
 // UPDATE APPLICATION
 router.put("/:id", verifyToken, applicationController.updateApplication);
 
-// DELETE PROJECT
+// DELETE APPLICATION
 router.delete("/:id", verifyToken, applicationController.deleteApplication);
 
-// GET PROJECT
+// GET APPLICATION
 router.get("/:id", verifyToken, applicationController.getApplication);
 
-// GET ALL PROJECT
+// GET ALL APPLICATION
 router.get("/", verifyToken, applicationController.getAllApplications);
+
+// GET All APPLICATION for a USER
+router.get("/user/:id", verifyToken, applicationController.getAllApplicationsForUser);
+
+// GET All APPLICATION for a USER'S POSTS
+router.get("/post/:id", verifyToken, applicationController.getAllApplicationsForUserPosts);
 
 module.exports = router

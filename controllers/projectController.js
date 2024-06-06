@@ -44,11 +44,31 @@ module.exports = {
         }
     },
 
-    // Delete Project func
+    // Delete Project function
     deleteProject: async (req, res) => {
         try {
-            await Project.findByIdAndDelete(req.params.id)
-            res.status(200).json("Project Successfully Deleted");
+            const project = await Project.findById(req.params.id);
+            if (!project) {
+                return res.status(404).json({ message: "Project not found" });
+            }
+
+            // Remove the project ID from users' posts or projects array
+            if (project.isOpen) {
+                await User.updateMany(
+                    { posts: project._id },
+                    { $pull: { posts: project._id } }
+                );
+            } else {
+                await User.updateMany(
+                    { projects: project._id },
+                    { $pull: { projects: project._id } }
+                );
+            }
+
+            // Delete the project
+            await project.remove();
+
+            res.status(200).json({ message: "Project successfully deleted" });
         } catch (error) {
             res.status(500).json(error);
         }
@@ -79,27 +99,43 @@ module.exports = {
         }
     },
 
-    // Turn Post to Project
+    // Turn Post to Project / Project to Post function
     postToProject: async (req, res) => {
         try {
+            const { isOpen } = req.body;
+
+            // Update the project with the new isOpen value
             const updatedProject = await Project.findByIdAndUpdate(
                 req.params.id,
-                {$set: req.body},
-                {new: true}
-            );
-
-            await User.findByIdAndUpdate(
-                updatedProject.owner,
-                { $pull: { posts: updatedProject._id } },
+                { $set: req.body },
                 { new: true }
             );
 
-            await User.updateMany(
-                { _id: { $in: updatedProject.team } },
-                { $push: { projects: updatedProject._id } }
-            );
+            if (isOpen) {
+                // Turn project to post
+                await User.updateMany(
+                    { _id: { $in: updatedProject.team } },
+                    { $pull: { projects: updatedProject._id } }
+                );
 
-            const {__v, createdAt, updatedAt, ...updatedProjectInfo} = updatedProject._doc;
+                await User.updateMany(
+                    { _id: { $in: updatedProject.team } },
+                    { $push: { posts: updatedProject._id } }
+                );
+            } else {
+                // Turn post to project
+                await User.updateMany(
+                    { _id: { $in: updatedProject.team } },
+                    { $pull: { posts: updatedProject._id } }
+                );
+
+                await User.updateMany(
+                    { _id: { $in: updatedProject.team } },
+                    { $push: { projects: updatedProject._id } }
+                );
+            }
+
+            const { __v, createdAt, updatedAt, ...updatedProjectInfo } = updatedProject._doc;
             res.status(200).json(updatedProjectInfo);
         } catch (error) {
             res.status(500).json(error);

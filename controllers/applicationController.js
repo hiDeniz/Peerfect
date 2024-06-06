@@ -50,11 +50,24 @@ module.exports = {
         }
     },
 
-    // Delete Application func
+    // Delete Application function
     deleteApplication: async (req, res) => {
         try {
-            await Application.findByIdAndDelete(req.params.id)
-            res.status(200).json("Application Successfully Deleted");
+            const application = await Application.findById(req.params.id);
+            if (!application) {
+                return res.status(404).json({ message: "Application not found" });
+            }
+
+            // Remove the application ID from the project's applications array
+            await Project.findByIdAndUpdate(
+                application.applicationTo,
+                { $pull: { applications: application._id } }
+            );
+
+            // Delete the application
+            await application.remove();
+
+            res.status(200).json({ message: "Application successfully deleted" });
         } catch (error) {
             res.status(500).json(error);
         }
@@ -80,6 +93,44 @@ module.exports = {
         try {
             const application = await Application.find()
             res.status(200).json(application);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    },
+
+    // Get All Applications for a User
+    getAllApplicationsForUser: async (req, res) => {
+        try {
+            const userId = req.params.id;
+            const applications = await Application.find({ owner: userId })
+                .populate({
+                    path: 'applicationTo',
+                    select: 'title description'
+                });
+
+            res.status(200).json(applications);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    },
+
+    // Get All Applications for a User's Posts
+    getAllApplicationsForUserPosts: async (req, res) => {
+        try {
+            const userId = req.params.id;
+
+            // Find the user's posts
+            const user = await User.findById(userId).populate('posts');
+            const postIds = user.posts.map(post => post._id);
+
+            // Find all applications made to the user's posts
+            const applications = await Application.find({ applicationTo: { $in: postIds } })
+                .populate({
+                    path: 'applicationTo',
+                    select: 'title description'
+                });
+
+            res.status(200).json(applications);
         } catch (error) {
             res.status(500).json(error);
         }

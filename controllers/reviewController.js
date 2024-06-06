@@ -42,8 +42,20 @@ module.exports = {
     // Delete Review func
     deleteReview: async (req, res) => {
         try {
-            await Review.findByIdAndDelete(req.params.id)
-            res.status(200).json("Review Successfully Deleted");
+            const review = await Review.findById(req.params.id);
+            if (!review) {
+                return res.status(404).json({ message: "Review not found" });
+            }
+
+            await User.findByIdAndUpdate(
+                review.reviewTo,
+                { $pull: { reviews: review._id } }
+            );
+
+            // Delete the review
+            await review.remove();
+
+            res.status(200).json({ message: "Review successfully deleted" });
         } catch (error) {
             res.status(500).json(error);
         }
