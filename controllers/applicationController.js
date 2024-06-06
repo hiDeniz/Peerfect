@@ -98,41 +98,32 @@ module.exports = {
         }
     },
 
-    // Get All Applications for a User
+    // Get All Applications for a User and User's Posts
     getAllApplicationsForUser: async (req, res) => {
         try {
             const userId = req.params.id;
-            const applications = await Application.find({ owner: userId })
+
+            // Find applications owned by the user
+            const myApplications = await Application.find({ owner: userId })
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
                 });
-
-            res.status(200).json(applications);
-        } catch (error) {
-            res.status(500).json(error);
-        }
-    },
-
-    // Get All Applications for a User's Posts
-    getAllApplicationsForUserPosts: async (req, res) => {
-        try {
-            const userId = req.params.id;
 
             // Find the user's posts
             const user = await User.findById(userId).populate('posts');
             const postIds = user.posts.map(post => post._id);
 
             // Find all applications made to the user's posts
-            const applications = await Application.find({ applicationTo: { $in: postIds } })
+            const projectApplications = await Application.find({ applicationTo: { $in: postIds } })
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
                 });
 
-            res.status(200).json(applications);
+            res.status(200).json({ myApplications, projectApplications });
         } catch (error) {
             res.status(500).json(error);
         }
-    },
+    }
 }
