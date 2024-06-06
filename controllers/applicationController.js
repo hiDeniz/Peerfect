@@ -40,11 +40,48 @@ module.exports = {
         try {
             const updatedApplication = await Application.findByIdAndUpdate(
                 req.params.id,
-                {$set: req.body},
-                {new: true}
+                { $set: req.body },
+                { new: true }
             );
-            const {__v, createdAt, updatedAt, ...updatedApplicationInfo} = updatedApplication._doc;
-            res.status(200).json(updatedApplicationInfo);
+            const { __v, createdAt, updatedAt, ...updatedApplicationInfo } = updatedApplication._doc;
+
+            // If the application status is "ACCEPTED", call joinProject
+            if (updatedApplicationInfo.status === "ACCEPTED") {
+                const projectId = updatedApplicationInfo.applicationTo;
+                const userId = updatedApplicationInfo.owner;
+
+                // Create a request object for joinProject
+                const joinProjectReq = {
+                    params: { id: projectId },
+                    user: { id: userId }
+                };
+
+                // Create a response object to capture the response from joinProject
+                const joinProjectRes = {
+                    status: (statusCode) => ({
+                        json: (responseBody) => {
+                            res.status(statusCode).json({
+                                message: "Application updated and user added to the project team",
+                                application: updatedApplicationInfo,
+                                project: responseBody.project
+                            });
+                        }
+                    }),
+                    statusCode: 200,
+                    json: (responseBody) => {
+                        res.status(200).json({
+                            message: "Application updated and user added to the project team",
+                            application: updatedApplicationInfo,
+                            project: responseBody.project
+                        });
+                    }
+                };
+
+                // Call joinProject function
+                await projectController.joinProject(joinProjectReq, joinProjectRes);
+            } else {
+                res.status(200).json(updatedApplicationInfo);
+            }
         } catch (error) {
             res.status(500).json(error);
         }

@@ -168,7 +168,38 @@ module.exports = {
                 { new: true }
             );
 
-            res.status(200).json({ message: "User added to the project team", project });
+            if (project.expectedPeople === 0) {
+                // Create a request object for postToProject
+                const postToProjectReq = {
+                    params: { id: projectId },
+                    body: { isOpen: false },
+                    user: req.user
+                };
+
+                // Create a response object to capture the response from postToProject
+                const postToProjectRes = {
+                    status: (statusCode) => ({
+                        json: (responseBody) => {
+                            res.status(statusCode).json({
+                                message: "User added to the project team and project closed",
+                                project: responseBody
+                            });
+                        }
+                    }),
+                    statusCode: 200,
+                    json: (responseBody) => {
+                        res.status(200).json({
+                            message: "User added to the project team and project closed",
+                            project: responseBody
+                        });
+                    }
+                };
+
+                // Call postToProject function
+                await module.exports.postToProject(postToProjectReq, postToProjectRes);
+            } else {
+                res.status(200).json({ message: "User added to the project team", project });
+            }
         } catch (error) {
             res.status(500).json(error);
         }
