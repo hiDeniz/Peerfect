@@ -20,7 +20,4 @@ router.get("/", verifyToken, applicationController.getAllApplications);
 // GET All APPLICATION for a USER
 router.get("/user/:id", verifyToken, applicationController.getAllApplicationsForUser);
 
-// GET All APPLICATION for a USER'S POSTS
-router.get("/post/:id", verifyToken, applicationController.getAllApplicationsForUserPosts);
-
 module.exports = router
