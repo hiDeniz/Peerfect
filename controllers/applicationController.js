@@ -142,14 +142,14 @@ module.exports = {
             const userId = req.params.id;
 
             // Find applications owned by the user
-            const myApplications = await Application.find({ owner: userId })
+            let myApplications = await Application.find({ owner: userId })
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname imageURL'
+                    select: '_id name surname imageUrl'
                 });
 
             // Find the user's posts
@@ -157,37 +157,45 @@ module.exports = {
             const postIds = user.posts.map(post => post._id);
 
             // Find all applications made to the user's posts
-            const projectApplications = await Application.find({ applicationTo: { $in: postIds } })
+            let projectApplications = await Application.find({ applicationTo: { $in: postIds } })
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname imageURL'
+                    select: '_id name surname imageUrl'
                 });
 
-            // Modify the data to include fullName
-            const formatApplications = (applications) => {
-                return applications.map(application => {
-                    if (application.owner) {
-                        application.owner.fullName = `${application.owner.name} ${application.owner.surname}`;
-                        delete application.owner.name;
-                        delete application.owner.surname;
+            // Transform myApplications to combine name and surname
+            myApplications = myApplications.map(application => {
+                const { name, surname, ...ownerRest } = application.owner;
+                const ownerFullName = `${name} ${surname}`;
+                return {
+                    ...application._doc,
+                    owner: {
+                        ...ownerRest,
+                        fullName: ownerFullName
                     }
-                    return application;
-                });
-            };
-
-            const formattedMyApplications = formatApplications(myApplications);
-            const formattedProjectApplications = formatApplications(projectApplications);
-
-            res.status(200).json({
-                myApplications: formattedMyApplications,
-                projectApplications: formattedProjectApplications
+                };
             });
+
+            // Transform projectApplications to combine name and surname
+            projectApplications = projectApplications.map(application => {
+                const { name, surname, ...ownerRest } = application.owner;
+                const ownerFullName = `${name} ${surname}`;
+                return {
+                    ...application._doc,
+                    owner: {
+                        ...ownerRest,
+                        fullName: ownerFullName
+                    }
+                };
+            });
+
+            res.status(200).json({ myApplications, projectApplications });
         } catch (error) {
             res.status(500).json(error);
         }
-    }
+    },
 }
