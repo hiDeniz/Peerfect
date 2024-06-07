@@ -149,7 +149,7 @@ module.exports = {
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname imageUrl'
+                    select: '_id name surname'
                 });
 
             // Find the user's posts
@@ -164,10 +164,28 @@ module.exports = {
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname imageUrl'
+                    select: '_id name surname'
                 });
 
-            res.status(200).json({ myApplications, projectApplications });
+            // Modify the data to include fullName
+            const formatApplications = (applications) => {
+                return applications.map(application => {
+                    if (application.owner) {
+                        application.owner.fullName = `${application.owner.name} ${application.owner.surname}`;
+                        delete application.owner.name;
+                        delete application.owner.surname;
+                    }
+                    return application;
+                });
+            };
+
+            const formattedMyApplications = formatApplications(myApplications);
+            const formattedProjectApplications = formatApplications(projectApplications);
+
+            res.status(200).json({
+                myApplications: formattedMyApplications,
+                projectApplications: formattedProjectApplications
+            });
         } catch (error) {
             res.status(500).json(error);
         }
