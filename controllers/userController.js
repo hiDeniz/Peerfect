@@ -40,10 +40,12 @@ module.exports = {
             const user = await User.findById(req.params.id)
                 .populate({
                     path: 'projects',
+                    match: { team: { $in: [req.user.id] } },
                     select: '_id relatedCourse title'
                 })
                 .populate({
                     path: 'posts',
+                    match: { team: { $in: [req.user.id] } },
                     select: '_id title expectedPeople relatedCourse minGPA description'
                 })
                 .populate({
@@ -101,9 +103,10 @@ module.exports = {
             const user = await User.findById(req.params.id)
                 .populate({
                     path: 'posts',
+                    match: { team: { $ne: req.user.id } }, // Filter to exclude posts where requester is in the team
                     select: '_id title expectedPeople relatedCourse minGPA description'
                 });
-    
+
             res.status(200).json(user.posts);
         } catch (error) {
             res.status(500).json(error);
@@ -153,7 +156,8 @@ module.exports = {
                     { expectedCourses: { $elemMatch: { $in: Array.from(completedCourses.keys()) } } }
                 ],
                 isOpen: true,
-                team: { $ne: user.id }
+                team: { $ne: user.id },
+                team: { $ne: [] }
             }).select('_id title expectedPeople relatedCourse minGPA description');
 
             res.status(200).json(projects);

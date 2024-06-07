@@ -93,8 +93,11 @@ module.exports = {
     // Get All Project func
     getAllProjects: async (req, res) => {
         try {
-            const project = await Project.find()
-            res.status(200).json(project);
+            const projects = await Project.find({
+                team: { $ne: [] } // Ensure the team array is not empty
+            }).select('_id title expectedPeople relatedCourse minGPA description');
+
+            res.status(200).json(projects);
         } catch (error) {
             res.status(500).json(error);
         }
