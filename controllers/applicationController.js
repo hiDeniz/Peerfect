@@ -149,7 +149,7 @@ module.exports = {
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname'
+                    select: '_id name surname imageUrl'
                 });
 
             // Find the user's posts
@@ -164,7 +164,7 @@ module.exports = {
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname'
+                    select: '_id name surname imageUrl'
                 });
 
             res.status(200).json({ myApplications, projectApplications });
