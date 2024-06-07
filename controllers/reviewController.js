@@ -47,17 +47,19 @@ module.exports = {
                 return res.status(404).json({ message: "Review not found" });
             }
 
+            // Remove the review ID from the user's reviews array
             await User.findByIdAndUpdate(
                 review.reviewTo,
                 { $pull: { reviews: review._id } }
             );
 
             // Delete the review
-            await review.remove();
+            await Review.findByIdAndDelete(req.params.id);
 
             res.status(200).json({ message: "Review successfully deleted" });
         } catch (error) {
-            res.status(500).json(error);
+            console.error(error); // Log the error for debugging purposes
+            res.status(500).json({ message: "Internal server error", error: error.message });
         }
     },
 

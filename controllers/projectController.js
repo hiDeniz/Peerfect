@@ -66,11 +66,12 @@ module.exports = {
             }
 
             // Delete the project
-            await project.remove();
+            await Project.findByIdAndDelete(req.params.id);
 
             res.status(200).json({ message: "Project successfully deleted" });
         } catch (error) {
-            res.status(500).json(error);
+            console.error(error); // Log the error for debugging purposes
+            res.status(500).json({ message: "Internal server error", error: error.message });
         }
     },
 
