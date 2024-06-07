@@ -149,7 +149,7 @@ module.exports = {
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname'
+                    select: '_id name surname imageURL'
                 });
 
             // Find the user's posts
@@ -164,7 +164,7 @@ module.exports = {
                 })
                 .populate({
                     path: 'owner',
-                    select: '_id name surname'
+                    select: '_id name surname imageURL'
                 });
 
             // Modify the data to include fullName
