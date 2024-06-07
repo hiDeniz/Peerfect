@@ -117,7 +117,7 @@ module.exports = {
             }
 
             // Delete the application
-            await application.remove();
+            await Application.findByIdAndDelete(req.params.id);
 
             res.status(200).json({ message: "Application successfully deleted" });
         } catch (error) {
@@ -125,7 +125,7 @@ module.exports = {
             res.status(500).json({ message: "Internal server error", error: error.message });
         }
     },
-    
+
     // Get Application func
     getApplication: async (req, res) => {
         try {
