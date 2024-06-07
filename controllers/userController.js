@@ -100,15 +100,17 @@ module.exports = {
     // Get Posts of User
     getUserPost: async (req, res) => {
         try {
-            const user = await User.findById(req.params.id);
+            const user = await User.findById(req.params.id)
+                .populate({
+                    path: 'posts',
+                    match: { 
+                        team: { $in: [req.user.id] }, // Ensure the requester is in the team
+                        isOpen: true // Only include posts that are open
+                    },
+                    select: '_id title expectedPeople relatedCourse minGPA description'
+                });
 
-            const projects = await Project.find({
-                owner: user._id,
-                team: { $ne: req.user.id },
-                isOpen: true
-            }).select('_id title expectedPeople relatedCourse minGPA description');
-
-            res.status(200).json(projects);
+            res.status(200).json(user.posts);
         } catch (error) {
             res.status(500).json(error);
         }
