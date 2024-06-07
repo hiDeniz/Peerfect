@@ -146,6 +146,10 @@ module.exports = {
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
+                })
+                .populate({
+                    path: 'owner',
+                    select: '_id name surname'
                 });
 
             // Find the user's posts
@@ -157,6 +161,10 @@ module.exports = {
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
+                })
+                .populate({
+                    path: 'owner',
+                    select: '_id name surname'
                 });
 
             res.status(200).json({ myApplications, projectApplications });
