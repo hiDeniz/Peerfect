@@ -97,26 +97,35 @@ module.exports = {
             }
 
             // Remove the application ID from the project's applications array
-            await Project.findByIdAndUpdate(
+            const projectUpdate = await Project.findByIdAndUpdate(
                 application.applicationTo,
-                { $pull: { applications: application._id } }
+                { $pull: { applications: application._id } },
+                { new: true }
             );
+            if (!projectUpdate) {
+                return res.status(404).json({ message: "Project not found" });
+            }
 
             // Remove the application ID from the user's myApplications array
-            await User.findByIdAndUpdate(
+            const userUpdate = await User.findByIdAndUpdate(
                 application.owner,
-                { $pull: { myApplications: application._id } }
+                { $pull: { myApplications: application._id } },
+                { new: true }
             );
+            if (!userUpdate) {
+                return res.status(404).json({ message: "User not found" });
+            }
 
             // Delete the application
             await application.remove();
 
             res.status(200).json({ message: "Application successfully deleted" });
         } catch (error) {
-            res.status(500).json(error);
+            console.error(error); // Log the error for debugging purposes
+            res.status(500).json({ message: "Internal server error", error: error.message });
         }
     },
-
+    
     // Get Application func
     getApplication: async (req, res) => {
         try {
