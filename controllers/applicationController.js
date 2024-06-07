@@ -142,7 +142,7 @@ module.exports = {
             const userId = req.params.id;
 
             // Find applications owned by the user
-            let myApplications = await Application.find({ owner: userId })
+            const myApplications = await Application.find({ owner: userId })
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
@@ -157,7 +157,7 @@ module.exports = {
             const postIds = user.posts.map(post => post._id);
 
             // Find all applications made to the user's posts
-            let projectApplications = await Application.find({ applicationTo: { $in: postIds } })
+            const projectApplications = await Application.find({ applicationTo: { $in: postIds } })
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
@@ -167,33 +167,24 @@ module.exports = {
                     select: '_id name surname imageUrl'
                 });
 
-            // Transform myApplications to combine name and surname
-            myApplications = myApplications.map(application => {
-                const { name, surname, ...ownerRest } = application.owner;
-                const ownerFullName = `${name} ${surname}`;
-                return {
-                    ...application._doc,
-                    owner: {
-                        ...ownerRest,
-                        fullName: ownerFullName
-                    }
-                };
+            // Format the response
+            const formatOwner = (owner) => ({
+                _id: owner._id,
+                fullName: `${owner.name} ${owner.surname}`,
+                imageUrl: owner.imageUrl
             });
 
-            // Transform projectApplications to combine name and surname
-            projectApplications = projectApplications.map(application => {
-                const { name, surname, ...ownerRest } = application.owner;
-                const ownerFullName = `${name} ${surname}`;
-                return {
-                    ...application._doc,
-                    owner: {
-                        ...ownerRest,
-                        fullName: ownerFullName
-                    }
-                };
-            });
+            const formattedMyApplications = myApplications.map(app => ({
+                ...app._doc,
+                owner: formatOwner(app.owner)
+            }));
 
-            res.status(200).json({ myApplications, projectApplications });
+            const formattedProjectApplications = projectApplications.map(app => ({
+                ...app._doc,
+                owner: formatOwner(app.owner)
+            }));
+
+            res.status(200).json({ myApplications: formattedMyApplications, projectApplications: formattedProjectApplications });
         } catch (error) {
             res.status(500).json(error);
         }
