@@ -102,6 +102,12 @@ module.exports = {
                 { $pull: { applications: application._id } }
             );
 
+            // Remove the application ID from the user's myApplications array
+            await User.findByIdAndUpdate(
+                application.owner,
+                { $pull: { myApplications: application._id } }
+            );
+
             // Delete the application
             await application.remove();
 
