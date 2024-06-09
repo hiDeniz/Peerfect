@@ -8,38 +8,44 @@ module.exports = {
     createApplication: async (req, res) => {
         try {
             const { owner, applicationTo, status } = req.body;
-
+    
+            // Check if the user already has an application for the same project
+            const existingApplication = await Application.findOne({ owner, applicationTo });
+            if (existingApplication) {
+                return res.status(400).json({ message: "You have already applied to this project!" });
+            }
+    
             const project = await Project.findById(applicationTo);
             if (project.team.includes(owner)) {
                 return res.status(400).json({ message: "You are already a member of the project!" });
             }
-
+    
             const newApplication = new Application({
                 owner,
                 applicationTo,
                 status
             });
-
+    
             const savedApplication = await newApplication.save();
-
+    
             await User.findByIdAndUpdate(
                 owner,
                 { $push: { myApplications: savedApplication._id } },
                 { new: true }
             );
-
+    
             await Project.findByIdAndUpdate(
                 applicationTo,
                 { $push: { applications: savedApplication._id } },
                 { new: true }
             );
-
+    
             res.status(201).json(savedApplication);
-
+    
         } catch (error) {
             res.status(500).json(error);
         }
-    },
+    },    
 
     // Update Application func
     updateApplication: async (req, res) => {
@@ -160,7 +166,7 @@ module.exports = {
     getAllApplicationsForUser: async (req, res) => {
         try {
             const userId = req.params.id;
-
+    
             // Find applications owned by the user
             const myApplications = await Application.find({ owner: userId })
                 .populate({
@@ -171,45 +177,51 @@ module.exports = {
                     path: 'owner',
                     select: '_id name surname imageUrl'
                 });
-
+    
             // Find the user's posts
             const user = await User.findById(userId).populate('posts');
             const postIds = user.posts.map(post => post._id);
-
-            // Find all applications made to the user's posts
+    
+            // Find all applications made to the user's posts or where the user is in the team
             const projectApplications = await Application.find({ 
                 applicationTo: { $in: postIds },
-                status: 'PENDING' // Only include applications with status 'PENDING'
+                status: 'PENDING'
             })
                 .populate({
                     path: 'applicationTo',
-                    select: 'title description'
+                    select: 'title description owner team'
                 })
                 .populate({
                     path: 'owner',
                     select: '_id name surname imageUrl'
                 });
-
+    
+            // Filter applications where the user is either the owner or a team member of the project
+            const filteredProjectApplications = projectApplications.filter(app => {
+                const project = app.applicationTo;
+                return project.owner.equals(userId) || project.team.includes(userId);
+            });
+    
             // Format the response
             const formatOwner = (owner) => ({
                 _id: owner._id,
                 fullName: `${owner.name} ${owner.surname}`,
                 imageUrl: owner.imageUrl
             });
-
+    
             const formattedMyApplications = myApplications.map(app => ({
                 ...app._doc,
                 owner: formatOwner(app.owner)
             }));
-
-            const formattedProjectApplications = projectApplications.map(app => ({
+    
+            const formattedProjectApplications = filteredProjectApplications.map(app => ({
                 ...app._doc,
                 owner: formatOwner(app.owner)
             }));
-
+    
             res.status(200).json({ myApplications: formattedMyApplications, projectApplications: formattedProjectApplications });
         } catch (error) {
             res.status(500).json(error);
         }
-    },
+    }    
 }

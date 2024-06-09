@@ -149,17 +149,9 @@ module.exports = {
     getUserHomePage: async (req, res) => {
         try {
             const user = await User.findById(req.params.id);
-    
-            // Check if the user is an admin
-            if (user.isAdmin) {
-                // Admin can see all open projects
-                const projects = await Project.find({ isOpen: true })
-                    .select('_id title expectedPeople relatedCourse minGPA description');
-                return res.status(200).json(projects);
-            }
-    
-            // Check if the user has a GPA
-            if (user.gpa == null) {
+
+            // Check if the user has a GPA or Check if the user is an admin
+            if (user.gpa == null || user.isAdmin) {
                 return res.status(400).json([]);
             }
     
