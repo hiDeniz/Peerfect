@@ -150,33 +150,36 @@ module.exports = {
         try {
             const user = await User.findById(req.params.id);
     
+            // Check if the user is an admin
+            if (user.isAdmin) {
+                // Admin can see all open projects
+                const projects = await Project.find({ isOpen: true })
+                    .select('_id title expectedPeople relatedCourse minGPA description');
+                return res.status(200).json(projects);
+            }
+    
             // Check if the user has a GPA
-            if (user.gpa == null && !user.isAdmin) {
+            if (user.gpa == null) {
                 return res.status(400).json([]);
             }
     
-            const { gpa, completedCourses, isAdmin } = user;
+            const { gpa, completedCourses } = user;
     
-            let projects;
-            if (isAdmin) {
-                projects = await Project.find({})
-                    .select('_id title expectedPeople relatedCourse minGPA description');
-            } else {
-                projects = await Project.find({
-                    minGPA: { $lte: gpa },
-                    $or: [
-                        { expectedCourses: { $exists: false } },
-                        { expectedCourses: { $elemMatch: { $in: Array.from(completedCourses.keys()) } } }
-                    ],
-                    isOpen: true,
-                    team: { $ne: user.id },
-                    owner: { $ne: user.id }
-                }).select('_id title expectedPeople relatedCourse minGPA description');
-            }
+            // Regular user query
+            const projects = await Project.find({
+                isOpen: true,
+                minGPA: { $lte: gpa },
+                owner: { $ne: user.id },
+                team: { $ne: user.id },
+                $or: [
+                    { expectedCourses: { $exists: false } },
+                    { expectedCourses: { $elemMatch: { $in: Array.from(completedCourses.keys()) } } }
+                ]
+            }).select('_id title expectedPeople relatedCourse minGPA description');
     
             res.status(200).json(projects);
         } catch (error) {
             res.status(500).json(error);
         }
-    },    
+    }        
 }
