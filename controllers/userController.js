@@ -152,7 +152,7 @@ module.exports = {
 
             // Check if the user has a GPA
             if (user.gpa == null) {
-                return res.status(400).json({ message: "Please update your profile to include your GPA to see projects." });
+                return res.status(400).json([]);
             }
 
             const { gpa, completedCourses } = user;
