@@ -9,6 +9,11 @@ module.exports = {
         try {
             const { owner, applicationTo, status } = req.body;
 
+            const project = await Project.findById(applicationTo);
+            if (project.team.includes(owner)) {
+                return res.status(400).json({ message: "You are already a member of the project!" });
+            }
+
             const newApplication = new Application({
                 owner,
                 applicationTo,
@@ -172,7 +177,10 @@ module.exports = {
             const postIds = user.posts.map(post => post._id);
 
             // Find all applications made to the user's posts
-            const projectApplications = await Application.find({ applicationTo: { $in: postIds } })
+            const projectApplications = await Application.find({ 
+                applicationTo: { $in: postIds },
+                status: 'PENDING' // Only include applications with status 'PENDING'
+            })
                 .populate({
                     path: 'applicationTo',
                     select: 'title description'
