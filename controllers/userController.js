@@ -149,29 +149,34 @@ module.exports = {
     getUserHomePage: async (req, res) => {
         try {
             const user = await User.findById(req.params.id);
-
+    
             // Check if the user has a GPA
-            if (user.gpa == null) {
+            if (user.gpa == null && !user.isAdmin) {
                 return res.status(400).json([]);
             }
-
-            const { gpa, completedCourses } = user;
-
-            const projects = await Project.find({
-                minGPA: { $lte: gpa },
-                $or: [
-                    { expectedCourses: { $exists: false } },
-                    { expectedCourses: { $elemMatch: { $in: Array.from(completedCourses.keys()) } } }
-                ],
-                isOpen: true,
-                team: { $ne: user.id },
-                team: { $ne: [] },
-                owner: { $ne: user.id }
-            }).select('_id title expectedPeople relatedCourse minGPA description');
-
+    
+            const { gpa, completedCourses, isAdmin } = user;
+    
+            let projects;
+            if (isAdmin) {
+                projects = await Project.find({})
+                    .select('_id title expectedPeople relatedCourse minGPA description');
+            } else {
+                projects = await Project.find({
+                    minGPA: { $lte: gpa },
+                    $or: [
+                        { expectedCourses: { $exists: false } },
+                        { expectedCourses: { $elemMatch: { $in: Array.from(completedCourses.keys()) } } }
+                    ],
+                    isOpen: true,
+                    team: { $ne: user.id },
+                    owner: { $ne: user.id }
+                }).select('_id title expectedPeople relatedCourse minGPA description');
+            }
+    
             res.status(200).json(projects);
         } catch (error) {
             res.status(500).json(error);
         }
-    },
+    },    
 }
