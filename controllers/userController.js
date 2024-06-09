@@ -150,6 +150,11 @@ module.exports = {
         try {
             const user = await User.findById(req.params.id);
 
+            // Check if the user has a GPA
+            if (user.gpa == null) {
+                return res.status(400).json({ message: "Please update your profile to include your GPA to see projects." });
+            }
+
             const { gpa, completedCourses } = user;
 
             const projects = await Project.find({
@@ -160,7 +165,8 @@ module.exports = {
                 ],
                 isOpen: true,
                 team: { $ne: user.id },
-                team: { $ne: [] }
+                team: { $ne: [] },
+                owner: { $ne: user.id }
             }).select('_id title expectedPeople relatedCourse minGPA description');
 
             res.status(200).json(projects);
