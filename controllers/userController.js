@@ -161,10 +161,9 @@ module.exports = {
             const projects = await Project.find({
                 isOpen: true,
                 minGPA: { $lte: gpa },
-                owner: { $ne: user.id },
                 team: { $ne: user.id },
                 $or: [
-                    { expectedCourses: { $exists: false } },
+                    { expectedCourses: { $size: 0 } },
                     { expectedCourses: { $elemMatch: { $in: Array.from(completedCourses.keys()) } } }
                 ]
             }).select('_id title expectedPeople relatedCourse minGPA description');
