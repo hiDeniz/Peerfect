@@ -10,7 +10,12 @@ module.exports = {
             const { owner, applicationTo, status } = req.body;
     
             // Check if the user already has an application for the same project
-            const existingApplication = await Application.findOne({ owner, applicationTo });
+            // Check if the user already has an application for the same project with status PENDING or ACCEPTED
+            const existingApplication = await Application.findOne({ 
+                owner, 
+                applicationTo,
+                status: { $in: ['PENDING', 'ACCEPTED'] } 
+            });
             if (existingApplication) {
                 return res.status(400).json({ message: "You have already applied to this project!" });
             }
