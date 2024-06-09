@@ -161,8 +161,7 @@ module.exports = {
             const projects = await Project.find({
                 isOpen: true,
                 minGPA: { $lte: gpa },
-                team: { $ne: user.id },
-                team: { $ne: [] },
+                team: { $not: { $elemMatch: { $eq: user.id } } },
                 $or: [
                     { expectedCourses: { $size: 0 } },
                     { expectedCourses: { $elemMatch: { $in: Array.from(completedCourses.keys()) } } }
