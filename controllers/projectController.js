@@ -32,12 +32,31 @@ module.exports = {
     // Update Project func
     updateProject: async (req, res) => {
         try {
+            // Retrieve the project before the update
+            const projectBeforeUpdate = await Project.findById(req.params.id);
+            if (!projectBeforeUpdate) {
+                return res.status(404).json({ message: "Project not found" });
+            }
+            const initialTeamSize = projectBeforeUpdate.team.length;
+
+            // Perform the update
             const updatedProject = await Project.findByIdAndUpdate(
                 req.params.id,
-                {$set: req.body},
-                {new: true}
+                { $set: req.body },
+                { new: true }
             );
-            const {__v, createdAt, updatedAt, ...updatedProjectInfo} = updatedProject._doc;
+
+            // Retrieve the updated project to get the new team size
+            const newTeamSize = updatedProject.team.length;
+
+            // Compare the sizes of the team array before and after the update
+            if (newTeamSize < initialTeamSize) {
+                // Update the expectedPeople count
+                updatedProject.expectedPeople -= (initialTeamSize - newTeamSize);
+                await updatedProject.save();
+            }
+
+            const { __v, createdAt, updatedAt, ...updatedProjectInfo } = updatedProject._doc;
             res.status(200).json(updatedProjectInfo);
         } catch (error) {
             res.status(500).json(error);

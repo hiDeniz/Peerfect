@@ -9,7 +9,6 @@ module.exports = {
         try {
             const { owner, applicationTo, status } = req.body;
     
-            // Check if the user already has an application for the same project
             // Check if the user already has an application for the same project with status PENDING or ACCEPTED
             const existingApplication = await Application.findOne({ 
                 owner, 
