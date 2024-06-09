@@ -52,7 +52,7 @@ module.exports = {
             // Compare the sizes of the team array before and after the update
             if (newTeamSize < initialTeamSize) {
                 // Update the expectedPeople count
-                updatedProject.expectedPeople -= (initialTeamSize - newTeamSize);
+                updatedProject.expectedPeople += (initialTeamSize - newTeamSize);
                 await updatedProject.save();
             }
 
